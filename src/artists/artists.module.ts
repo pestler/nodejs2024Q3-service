@@ -3,7 +3,7 @@ import { ArtistsService } from './artists.service';
 import { ArtistsController } from './artists.controller';
 
 @Module({
+  controllers: [ArtistsController],
   providers: [ArtistsService],
-  controllers: [ArtistsController]
 })
 export class ArtistsModule {}
