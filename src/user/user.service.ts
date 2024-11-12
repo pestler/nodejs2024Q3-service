@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { NoPasswordUser, User } from 'src/database/interface';
@@ -7,7 +7,7 @@ import { dataBase } from 'src/database/database';
 
 @Injectable()
 export class UserService {
-  deletePassword(val: User): NoPasswordUser {
+  HidePasswordUser(val: User): NoPasswordUser {
     const copyVal = { ...val };
     delete copyVal.password;
     return copyVal;
@@ -23,23 +23,41 @@ export class UserService {
       updatedAt: Date.now(),
     };
     dataBase.users.push(user);
-    return this.deletePassword(user);
+    return this.HidePasswordUser(user);
   }
 
   findAll(): NoPasswordUser {
     const user: User = dataBase.users.find((user) => user.password);
-    return this.deletePassword(user);
+    return this.HidePasswordUser(user);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  findOne(id: string) {
+    const user = dataBase.users.find((user) => user.id == id);
+    if (!user) {
+      throw new HttpException("user doesn't exist", HttpStatus.NOT_FOUND);
+    }
+    return this.HidePasswordUser(user);
   }
 
-  update(id: number, _updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  update(id: string, updateUserDto: UpdateUserDto) {
+    const user = dataBase.users.find((user) => user.id == id);
+    if (!user)
+      throw new HttpException("user doesn't exit", HttpStatus.NOT_FOUND);
+    if (user.password !== updateUserDto.oldPassword)
+      throw new HttpException('old password invalid', HttpStatus.FORBIDDEN);
+    user.password = updateUserDto.newPassword;
+    user.updatedAt = Date.now();
+    user.version++;
+    const cutUser = { ...user };
+    delete cutUser.password;
+    return cutUser;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  remove(id: string) {
+    const indexUser = dataBase.users.findIndex((user) => user.id == id);
+    if (indexUser == -1)
+      throw new HttpException("user doesn't exist", HttpStatus.NOT_FOUND);
+    dataBase.users.splice(indexUser, 1);
+    return `User id=${id} deleted`;
   }
 }
