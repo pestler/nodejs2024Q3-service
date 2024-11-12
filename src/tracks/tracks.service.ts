@@ -1,26 +1,46 @@
-import { Injectable } from '@nestjs/common';
+import { dataBase } from './../database/database';
+import { HttpException, Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
+import { v4 as uuid } from 'uuid';
+import { StatusCodes } from 'http-status-codes';
+import { Track } from 'src/database/interface';
 
 @Injectable()
 export class TracksService {
-  create(createTrackDto: CreateTrackDto) {
-    return 'This action adds a new track';
+  create(createTrackDto: CreateTrackDto): Track[] {
+    const track = {
+      id: uuid(),
+      ...createTrackDto,
+    };
+    dataBase.tracks.push(track);
+    return dataBase.tracks;
   }
 
   findAll() {
-    return `This action returns all tracks`;
+    return dataBase.tracks;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} track`;
+  findOne(id: string) {
+    return dataBase.tracks.find((track) => track.id === id);
   }
 
-  update(id: number, updateTrackDto: UpdateTrackDto) {
-    return `This action updates a #${id} track`;
+  update(id: string, updateTrackDto: UpdateTrackDto) {
+    const track = this.findOne(id);
+    if (!track)
+      throw new HttpException("Track doesn't exist", StatusCodes.NOT_FOUND);
+    track.name = updateTrackDto.name;
+    track.artistId = updateTrackDto.artistId;
+    track.albumId = updateTrackDto.albumId;
+    track.duration = updateTrackDto.duration;
+    return track;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} track`;
+  remove(id: string) {
+    const indexTrack = dataBase.tracks.findIndex((track) => track.id == id);
+    if (indexTrack == -1)
+      throw new HttpException("Track doesn't exist", StatusCodes.NOT_FOUND);
+    dataBase.tracks.splice(indexTrack, 1);
+    return `Track id=${id} deleted`;
   }
 }
