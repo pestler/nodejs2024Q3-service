@@ -26,9 +26,12 @@ export class UserService {
     return this.HidePasswordUser(user);
   }
 
-  findAll(): NoPasswordUser {
-    const user: User = dataBase.users.find((user) => user.password);
-    return this.HidePasswordUser(user);
+  findAll() {
+    return dataBase.users.map((user) => {
+      const { password, ...usersHidePassword } = user;
+      console.log(`hide password ${password}`);
+      return usersHidePassword;
+    });
   }
 
   findOne(id: string) {
@@ -45,12 +48,13 @@ export class UserService {
       throw new HttpException("user doesn't exit", HttpStatus.NOT_FOUND);
     if (user.password !== updateUserDto.oldPassword)
       throw new HttpException('old password invalid', HttpStatus.FORBIDDEN);
+
     user.password = updateUserDto.newPassword;
     user.updatedAt = Date.now();
     user.version++;
-    const cutUser = { ...user };
-    delete cutUser.password;
-    return cutUser;
+    console.log(user.password);
+    console.log(user);
+    return this.HidePasswordUser(user);
   }
 
   remove(id: string) {
