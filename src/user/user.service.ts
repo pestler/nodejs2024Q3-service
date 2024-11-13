@@ -44,8 +44,10 @@ export class UserService {
     return this.dataBase.users.map((user) => this.HidePasswordUser(user));
   }
 
-  findOne(id: string) {
-    const user = this.dataBase.users.find((user) => user.id == id);
+  findOne(id: string): Omit<User, 'password'> {
+    const user: User | undefined = this.dataBase.users.find(
+      (user) => user.id === id,
+    );
     if (!user) {
       throw new HttpException("user doesn't exist", HttpStatus.NOT_FOUND);
     }
