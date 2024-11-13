@@ -16,7 +16,6 @@ export class TracksService {
       ...createTrackDto,
     });
     this.dataBase.tracks.push(track);
-    //console.log(this.dataBase.tracks);
     return track;
   }
 

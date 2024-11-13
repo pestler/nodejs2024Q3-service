@@ -10,13 +10,13 @@ import { Album } from './entities/album.entity';
 export class AlbumsService {
   constructor(private dataBase: DataBase) {}
 
-  create(createAlbumDto: CreateAlbumDto): Album[] {
-    const album = {
+  create(createAlbumDto: CreateAlbumDto): Album {
+    const album = new Album({
       id: uuid(),
       ...createAlbumDto,
-    };
+    });
     this.dataBase.albums.push(album);
-    return this.dataBase.albums;
+    return album;
   }
 
   findAll() {

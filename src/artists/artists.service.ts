@@ -10,10 +10,10 @@ import { Artist } from './entities/artist.entity';
 export class ArtistsService {
   constructor(private dataBase: DataBase) {}
 
-  create(createArtistDto: CreateArtistDto): Artist[] {
+  create(createArtistDto: CreateArtistDto): Artist {
     const artist = new Artist({ id: uuid(), ...createArtistDto });
     this.dataBase.artists.push(artist);
-    return this.dataBase.artists;
+    return artist;
   }
 
   findAll(): Artist[] {
