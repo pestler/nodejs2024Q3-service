@@ -63,8 +63,6 @@ export class UserService {
     user.password = updateUserDto.newPassword;
     user.updatedAt = Date.now();
     user.version++;
-    console.log(user.password);
-    console.log(user);
     return this.HidePasswordUser(user);
   }
 
