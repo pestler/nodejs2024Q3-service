@@ -6,16 +6,20 @@ import {
   Param,
   Delete,
   Put,
+  UsePipes,
+  HttpCode,
 } from '@nestjs/common';
 import { ArtistsService } from './artists.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
+import { validationPipe } from 'src/pipes/validation.pipe';
 
 @Controller('artist')
 export class ArtistsController {
   constructor(private readonly artistsService: ArtistsService) {}
 
   @Post()
+  @UsePipes(validationPipe)
   create(@Body() createArtistDto: CreateArtistDto) {
     return this.artistsService.create(createArtistDto);
   }
@@ -31,11 +35,13 @@ export class ArtistsController {
   }
 
   @Put(':id')
+  @UsePipes(validationPipe)
   update(@Param('id') id: string, @Body() updateArtistDto: UpdateArtistDto) {
     return this.artistsService.update(id, updateArtistDto);
   }
 
   @Delete(':id')
+  @HttpCode(204)
   remove(@Param('id') id: string) {
     return this.artistsService.remove(id);
   }

@@ -7,17 +7,20 @@ import {
   Delete,
   Put,
   HttpCode,
+  UsePipes,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { validationPipe } from 'src/pipes/validation.pipe';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
+  @UsePipes(validationPipe)
   create(@Body() createUserDto: CreateUserDto): Omit<User, 'password'> {
     return this.userService.create(createUserDto);
   }
@@ -33,6 +36,7 @@ export class UserController {
   }
 
   @Put(':id')
+  @UsePipes(validationPipe)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto);
   }
