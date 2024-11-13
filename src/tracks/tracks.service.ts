@@ -4,19 +4,20 @@ import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { v4 as uuid } from 'uuid';
 import { StatusCodes } from 'http-status-codes';
-import { Track } from 'src/database/interface';
+import { Track } from './entities/track.entity';
 
 @Injectable()
 export class TracksService {
   constructor(private dataBase: DataBase) {}
 
-  create(createTrackDto: CreateTrackDto): Track[] {
-    const track = {
+  create(createTrackDto: CreateTrackDto): Track {
+    const track = new Track({
       id: uuid(),
       ...createTrackDto,
-    };
+    });
     this.dataBase.tracks.push(track);
-    return this.dataBase.tracks;
+    //console.log(this.dataBase.tracks);
+    return track;
   }
 
   findAll() {

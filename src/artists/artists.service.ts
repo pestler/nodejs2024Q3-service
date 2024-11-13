@@ -3,15 +3,15 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { v4 as uuid } from 'uuid';
-import { Artist } from 'src/database/interface';
 import { StatusCodes } from 'http-status-codes';
+import { Artist } from './entities/artist.entity';
 
 @Injectable()
 export class ArtistsService {
   constructor(private dataBase: DataBase) {}
 
   create(createArtistDto: CreateArtistDto): Artist[] {
-    const artist = { id: uuid(), ...createArtistDto };
+    const artist = new Artist({ id: uuid(), ...createArtistDto });
     this.dataBase.artists.push(artist);
     return this.dataBase.artists;
   }
@@ -40,5 +40,18 @@ export class ArtistsService {
     if (indexArtist == -1)
       throw new HttpException("artist doesn't exist", StatusCodes.NOT_FOUND);
     this.dataBase.artists.splice(indexArtist, 1);
+
+    this.dataBase.albums
+      .filter((album) => album.artistId == id)
+      .forEach((album) => (album.artistId = null));
+
+    this.dataBase.tracks
+      .filter((track) => track.artistId == id)
+      .forEach((track) => (track.artistId = null));
+
+    this.dataBase.favorites.artists = this.dataBase.favorites.artists.filter(
+      (artistId) => artistId != id,
+    );
+    return `Artist id=${id} deleted`;
   }
 }

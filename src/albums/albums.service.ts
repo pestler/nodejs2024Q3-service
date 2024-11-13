@@ -2,9 +2,9 @@ import { DataBase } from './../database/database';
 import { HttpException, Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { Album } from 'src/database/interface';
 import { v4 as uuid } from 'uuid';
 import { StatusCodes } from 'http-status-codes';
+import { Album } from './entities/album.entity';
 
 @Injectable()
 export class AlbumsService {
@@ -44,5 +44,15 @@ export class AlbumsService {
     if (indexAlbum == -1)
       throw new HttpException("album doesn't exists", StatusCodes.NOT_FOUND);
     this.dataBase.albums.splice(indexAlbum, 1);
+
+    this.dataBase.tracks
+      .filter((track) => track.albumId == id)
+      .forEach((track) => (track.albumId = null));
+
+    this.dataBase.favorites.albums = this.dataBase.favorites.albums.filter(
+      (albumId) => albumId != id,
+    );
+
+    return `Album id=${id} deleted`;
   }
 }
