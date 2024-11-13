@@ -20,7 +20,7 @@ import { UserModule } from './user/user.module';
     AlbumsModule,
     UserModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, AlbumsService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

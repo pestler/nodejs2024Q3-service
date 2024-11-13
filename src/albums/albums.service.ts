@@ -1,4 +1,4 @@
-import { dataBase } from './../database/database';
+import { DataBase } from './../database/database';
 import { HttpException, Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
@@ -8,25 +8,27 @@ import { StatusCodes } from 'http-status-codes';
 
 @Injectable()
 export class AlbumsService {
+  constructor(private dataBase: DataBase) {}
+
   create(createAlbumDto: CreateAlbumDto): Album[] {
     const album = {
       id: uuid(),
       ...createAlbumDto,
     };
-    dataBase.albums.push(album);
-    return dataBase.albums;
+    this.dataBase.albums.push(album);
+    return this.dataBase.albums;
   }
 
   findAll() {
-    return dataBase.albums;
+    return this.dataBase.albums;
   }
 
   findOne(id: string) {
-    return dataBase.albums.find((album) => album.id === id);
+    return this.dataBase.albums.find((album) => album.id === id);
   }
 
   update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    const album = dataBase.albums.find((album) => album.id == id);
+    const album = this.dataBase.albums.find((album) => album.id == id);
     if (!album)
       throw new HttpException("album doesn't exists", StatusCodes.NOT_FOUND);
     album.name = updateAlbumDto.name;
@@ -36,9 +38,11 @@ export class AlbumsService {
   }
 
   remove(id: string) {
-    const indexAlbum = dataBase.albums.findIndex((album) => album.id == id);
+    const indexAlbum = this.dataBase.albums.findIndex(
+      (album) => album.id == id,
+    );
     if (indexAlbum == -1)
       throw new HttpException("album doesn't exists", StatusCodes.NOT_FOUND);
-    dataBase.albums.splice(indexAlbum, 1);
+    this.dataBase.albums.splice(indexAlbum, 1);
   }
 }

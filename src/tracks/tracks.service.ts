@@ -1,4 +1,4 @@
-import { dataBase } from './../database/database';
+import { DataBase } from './../database/database';
 import { HttpException, Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
@@ -8,21 +8,23 @@ import { Track } from 'src/database/interface';
 
 @Injectable()
 export class TracksService {
+  constructor(private dataBase: DataBase) {}
+
   create(createTrackDto: CreateTrackDto): Track[] {
     const track = {
       id: uuid(),
       ...createTrackDto,
     };
-    dataBase.tracks.push(track);
-    return dataBase.tracks;
+    this.dataBase.tracks.push(track);
+    return this.dataBase.tracks;
   }
 
   findAll() {
-    return dataBase.tracks;
+    return this.dataBase.tracks;
   }
 
   findOne(id: string) {
-    return dataBase.tracks.find((track) => track.id === id);
+    return this.dataBase.tracks.find((track) => track.id === id);
   }
 
   update(id: string, updateTrackDto: UpdateTrackDto) {
@@ -37,10 +39,12 @@ export class TracksService {
   }
 
   remove(id: string) {
-    const indexTrack = dataBase.tracks.findIndex((track) => track.id == id);
+    const indexTrack = this.dataBase.tracks.findIndex(
+      (track) => track.id == id,
+    );
     if (indexTrack == -1)
       throw new HttpException("Track doesn't exist", StatusCodes.NOT_FOUND);
-    dataBase.tracks.splice(indexTrack, 1);
+    this.dataBase.tracks.splice(indexTrack, 1);
     return `Track id=${id} deleted`;
   }
 }

@@ -1,13 +1,10 @@
-export interface NoPasswordUser {
-  id: string; // uuid v4
+export interface User {
+  id?: string; // uuid v4
   login: string;
-  version: number; // integer number, increments on update
-  createdAt: number; // timestamp of creation
-  updatedAt: number; // timestamp of last update
-}
-
-export interface User extends NoPasswordUser {
   password: string;
+  version?: number; // integer number, increments on update
+  createdAt?: number; // timestamp of creation
+  updatedAt?: number; // timestamp of last update
 }
 
 export interface Artist {
@@ -32,7 +29,7 @@ export interface Track {
 }
 
 export interface Favorites {
-  artists: string[]; // favorite artists ids
-  albums: string[]; // favorite albums ids
-  tracks: string[]; // favorite tracks ids
+  artists: Artist[]; // favorite artists ids
+  albums: Album[]; // favorite albums ids
+  tracks: Track[]; // favorite tracks ids
 }

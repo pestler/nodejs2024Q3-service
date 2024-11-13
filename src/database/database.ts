@@ -1,19 +1,12 @@
-import { User, Artist, Album, Track, Favorites } from './interface';
+import { Injectable } from '@nestjs/common';
+import { Artist, Album, Track, Favorites } from './interface';
+import { User } from 'src/user/entities/user.entity';
 
-export const dataBase: {
-  users: User[];
-  artists: Artist[];
-  albums: Album[];
-  tracks: Track[];
-  favorites: Favorites;
-} = {
-  users: [],
-  artists: [],
-  albums: [],
-  tracks: [],
-  favorites: {
-    artists: [],
-    albums: [],
-    tracks: [],
-  },
-};
+@Injectable()
+export class DataBase {
+  public users: User[] = [];
+  public artists: Artist[] = [];
+  public albums: Album[] = [];
+  public tracks: Track[] = [];
+  public favorites: Favorites;
+}
