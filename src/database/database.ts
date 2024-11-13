@@ -8,5 +8,5 @@ export class DataBase {
   public artists: Artist[] = [];
   public albums: Album[] = [];
   public tracks: Track[] = [];
-  public favorites: Favorites;
+  public favorites: Favorites = { artists: [], albums: [], tracks: [] };
 }
