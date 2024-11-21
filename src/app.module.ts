@@ -7,6 +7,7 @@ import { FavoritesModule } from './favorites/favorites.module';
 import { ArtistsModule } from './artists/artists.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UserModule } from './user/user.module';
     FavoritesModule,
     AlbumsModule,
     UserModule,
+    PrismaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
