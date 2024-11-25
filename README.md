@@ -67,3 +67,4 @@ npm run lint
 ```
 npm run format
 ```
+REST service: Logging & Error Handling and Authentication and Authorization
