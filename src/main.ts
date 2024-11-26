@@ -6,11 +6,17 @@ import 'dotenv/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  const PORT = process.env.PORT ?? 4000;
   const document: OpenAPIObject = YAML.load('./doc/api.yaml');
-  SwaggerModule.setup('doc', app, document);
+  SwaggerModule.setup('api', app, document);
 
-  await app.listen(process.env.PORT ?? 4000);
+  await app.listen(PORT, () => {
+    const appMsg = `Application is running at: http://localhost:${PORT}`;
+    const docsMsg = `Home Library Service: You can find documentation at the: http://localhost:${PORT}/api`;
+
+    console.log(appMsg);
+    console.log(docsMsg);
+  });
 }
 
 bootstrap();

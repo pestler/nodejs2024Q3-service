@@ -1,10 +1,10 @@
 networks:
-  hls-network:
+  network:
     driver: bridge
 
 services:
   app:
-    container_name: hls-app
+    container_name: app
     image: nodejs2024q3service:latest
     ports:
       - ${PORT}:${PORT}
@@ -15,13 +15,13 @@ services:
       - ./src:/app/src
       - ./prisma:/app/prisma
     networks:
-      - hls-network
+      - network
     depends_on:
       - postgres
     restart: always
 
   postgres:
-    container_name: hls-postgres
+    container_name: postgres
     image: nodejs2024q3service-db:latest
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
@@ -34,7 +34,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - postgres_logs:/var/log/postgresql
     networks:
-      - hls-network
+      - network
     restart: always
 
 volumes:
