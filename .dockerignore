@@ -80,4 +80,3 @@ docker-compose.yml
 .env
 .env.example
 /.husky
-/doc
