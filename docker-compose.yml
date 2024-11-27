@@ -3,7 +3,8 @@ services:
     image: postgres:17.2-alpine
     build:
       context: .
-      dockerfile: ./postgre-db/Dockerfile        
+      dockerfile: ./postgre-db/Dockerfile
+    restart: always              
     env_file:
       - .env
     environment:
@@ -18,7 +19,12 @@ services:
       - postgres_logs:/var/log/postgresql
     networks:
       - network
-    restart: always      
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}", "-h", "database", "-p", "${POSTGRES_PORT}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 5s
 
 
   app:   
@@ -31,12 +37,23 @@ services:
     env_file:
       - .env
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     volumes:
-      - ./src:/usr/app/src
+      - ./src:/app/src
       - /app/node_modules    
     networks:
-      - network    
+      - network
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+        - action: sync+restart
+          path: ./config
+          target: /app/config
+          ignore:
+            - node_modules/    
     
 volumes:
   postgres_data:

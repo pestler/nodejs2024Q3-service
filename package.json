@@ -20,16 +20,15 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "swagger:convert": "ts-node -r tsconfig-paths/register src/swagger/swagger-converter.ts",
-    "docker:startup": "docker compose up",
-    "docker:start": "npm run docker:build && docker compose up -d",    
+    "swagger:convert": "ts-node -r tsconfig-paths/register src/swagger/swagger-converter.ts",    
+    "docker": "docker-compose up --watch",    
     "docker:test": "docker exec app npm run test",
     "docker:scout": "docker scout cves pestler/nodejs2024q3-service:app-v2 && docker scout cves pestler/nodejs2024q3-service:postgres",
+    "docker:restart": "npm run docker:stop && npm run docker:start",
     "prisma:generate-migrate": "prisma generate && prisma migrate deploy && nest start --watch",
-    "audit": "npm audit --audit-level=high",
-    "docker:build": "docker build -t dockergulia/library-service-with-docker:1.0.0 .",
-    "docker:stop": "docker compose down",
-    "docker:restart": "npm run docker:stop && npm run docker:start"
+    "prisma:migrate": "prisma migrate deploy && nest start --watch",
+    "audit": "npm audit --audit-level=high",    
+    "docker:stop": "docker compose down"
   },
   "dependencies": {
     "@nestjs/common": "^10.4.9",
