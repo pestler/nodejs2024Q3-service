@@ -12,7 +12,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/main",    
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest --testMatch \"<rootDir>/*.spec.ts\" --noStackTrace --runInBand",
     "test:auth": "cross-env TEST_MODE=auth jest --testPathIgnorePatterns refresh.e2e.spec.ts --noStackTrace --runInBand",
@@ -21,11 +21,15 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "swagger:convert": "ts-node -r tsconfig-paths/register src/swagger/swagger-converter.ts",
-    "docker:start": "docker compose up",
-    "docker:stop": "docker stop app && docker stop database",
+    "docker:startup": "docker compose up",
+    "docker:start": "npm run docker:build && docker compose up -d",    
     "docker:test": "docker exec app npm run test",
     "docker:scout": "docker scout cves pestler/nodejs2024q3-service:app-v2 && docker scout cves pestler/nodejs2024q3-service:postgres",
-    "prisma:prisma-db": "prisma generate && prisma migrate deploy && nest start --watch"
+    "prisma:generate-migrate": "prisma generate && prisma migrate deploy && nest start --watch",
+    "audit": "npm audit --audit-level=high",
+    "docker:build": "docker build -t dockergulia/library-service-with-docker:1.0.0 .",
+    "docker:stop": "docker compose down",
+    "docker:restart": "npm run docker:stop && npm run docker:start"
   },
   "dependencies": {
     "@nestjs/common": "^10.4.9",
