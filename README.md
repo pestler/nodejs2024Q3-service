@@ -39,18 +39,20 @@ The **Home Library Service**
     ```
     PORT=4000
 
-     POSTGRES_PORT=5432
-     POSTGRES_USER=user
-     POSTGRES_PASSWORD=password
-     POSTGRES_DB=postgress
+POSTGRES_PORT=5432
+POSTGRES_USER=admin
+POSTGRES_PASSWORD=admin
+POSTGRES_DB=mydb
+POSTGRES_HOST=database 
 
-     CRYPT_SALT=10
-     JWT_SECRET_KEY=secret
-     JWT_SECRET_REFRESH_KEY=secret
-     TOKEN_EXPIRE_TIME=1h
-     TOKEN_REFRESH_EXPIRE_TIME=24h
+CRYPT_SALT=10
+JWT_SECRET_KEY=secret
+JWT_SECRET_REFRESH_KEY=secret
+TOKEN_EXPIRE_TIME=1h
+TOKEN_REFRESH_EXPIRE_TIME=24h
 
-     DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public
+DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public
+
     ```
     If `PORT` variable is not provided, the application will use port `4000` by default.
 
@@ -66,9 +68,7 @@ The application can be run using `Docker`.
  
 Go to the root project directory and run the following command:
 
-```bash
-docker compose up
-```
+npm run docker
 
 After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/api/.

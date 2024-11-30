@@ -8,11 +8,13 @@ import {
   Put,
   HttpCode,
   UsePipes,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { TracksService } from './tracks.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { validationPipe } from 'src/pipes/validation.pipe';
+import { Track } from './entities/track.entity';
 
 @Controller('track')
 export class TracksController {
@@ -30,19 +32,23 @@ export class TracksController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  @UsePipes(validationPipe)
+  findOne(@Param('id', ParseUUIDPipe) id: string): Track {
     return this.tracksService.findOne(id);
   }
 
   @Put(':id')
   @UsePipes(validationPipe)
-  update(@Param('id') id: string, @Body() updateTrackDto: UpdateTrackDto) {
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateTrackDto: UpdateTrackDto,
+  ) {
     return this.tracksService.update(id, updateTrackDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.tracksService.remove(id);
   }
 }

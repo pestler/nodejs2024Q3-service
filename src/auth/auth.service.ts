@@ -1,26 +1,35 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
+//import { PrismaService } from './../prisma/prisma.service';
+import { JwtService } from '@nestjs/jwt';
+import { AuthEntity } from './dto/auth.entity';
+import { DataBase } from 'src/database/database';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
-  }
+  constructor(private dataBase: DataBase, private jwtService: JwtService) {}
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+  async login(login: string, password: string): Promise<AuthEntity> {
+    const user: User | undefined = this.dataBase.users.find(
+      (user) => user.login === login,
+    );
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+    if (!user) {
+      throw new NotFoundException(`No user found for login: ${login}`);
+    }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
+    const isPasswordValid = user.password === password;
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid password');
+    }
+
+    return {
+      accessToken: this.jwtService.sign({ userId: user.id }),
+    };
   }
 }

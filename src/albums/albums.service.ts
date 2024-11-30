@@ -1,5 +1,5 @@
 import { DataBase } from './../database/database';
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { v4 as uuid } from 'uuid';
@@ -19,16 +19,20 @@ export class AlbumsService {
     return album;
   }
 
-  findAll() {
+  findAll(): Album[] {
     return this.dataBase.albums;
   }
 
-  findOne(id: string) {
-    return this.dataBase.albums.find((album) => album.id === id);
+  findOne(id: string): Album {
+    const album = this.dataBase.albums.find((album) => album.id === id);
+    if (!album) {
+      throw new NotFoundException('Album not found');
+    }
+    return album;
   }
 
-  update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    const album = this.dataBase.albums.find((album) => album.id == id);
+  update(id: string, updateAlbumDto: UpdateAlbumDto): Album {
+    const album = this.findOne(id);
     if (!album)
       throw new HttpException("album doesn't exists", StatusCodes.NOT_FOUND);
     album.name = updateAlbumDto.name;
@@ -37,7 +41,7 @@ export class AlbumsService {
     return album;
   }
 
-  remove(id: string) {
+  remove(id: string | Album) {
     const indexAlbum = this.dataBase.albums.findIndex(
       (album) => album.id == id,
     );

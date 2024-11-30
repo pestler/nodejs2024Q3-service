@@ -54,6 +54,13 @@ export class UserService {
     return this.HidePasswordUser(user);
   }
 
+  findLogin(login: string) {
+    const user: User | undefined = this.dataBase.users.find(
+      (user) => user.login === login,
+    );
+    return user;
+  }
+
   update(id: string, updateUserDto: UpdateUserDto) {
     const user = this.dataBase.users.find((user) => user.id == id);
     if (!user)

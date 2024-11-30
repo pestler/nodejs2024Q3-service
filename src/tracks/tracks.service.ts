@@ -1,5 +1,5 @@
 import { DataBase } from './../database/database';
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { v4 as uuid } from 'uuid';
@@ -23,11 +23,15 @@ export class TracksService {
     return this.dataBase.tracks;
   }
 
-  findOne(id: string) {
-    return this.dataBase.tracks.find((track) => track.id === id);
+  findOne(id: string): Track {
+    const track = this.dataBase.tracks.find((track) => track.id === id);
+    if (!track) {
+      throw new NotFoundException('track not found');
+    }
+    return track;
   }
 
-  update(id: string, updateTrackDto: UpdateTrackDto) {
+  update(id: string, updateTrackDto: UpdateTrackDto): Track {
     const track = this.findOne(id);
     if (!track)
       throw new HttpException("Track doesn't exist", StatusCodes.NOT_FOUND);

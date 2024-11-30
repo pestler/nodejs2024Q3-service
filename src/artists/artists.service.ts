@@ -1,5 +1,5 @@
 import { DataBase } from './../database/database';
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { v4 as uuid } from 'uuid';
@@ -16,16 +16,20 @@ export class ArtistsService {
     return artist;
   }
 
-  findAll(): Artist[] {
+  findAll(): Artist[] | [] {
     return this.dataBase.artists;
   }
 
-  findOne(id: string) {
-    return this.dataBase.artists.find((artist) => artist.id === id);
+  findOne(id: string): Artist {
+    const artist = this.dataBase.artists.find((artist) => artist.id === id);
+    if (!artist) {
+      throw new NotFoundException('Artist not found');
+    }
+    return artist;
   }
 
   update(id: string, updateArtistDto: UpdateArtistDto) {
-    const artist = this.dataBase.artists.find((artist) => artist.id == id);
+    const artist = this.findOne(id);
     if (!artist)
       throw new HttpException("artist doesn't exist", StatusCodes.NOT_FOUND);
     artist.name = updateArtistDto.name;
@@ -33,7 +37,7 @@ export class ArtistsService {
     return artist;
   }
 
-  remove(id: string) {
+  remove(id: string | Artist) {
     const indexArtist = this.dataBase.artists.findIndex(
       (artist) => artist.id == id,
     );

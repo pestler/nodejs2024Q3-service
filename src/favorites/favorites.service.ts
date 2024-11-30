@@ -1,88 +1,76 @@
+import { Artist } from './../artists/entities/artist.entity';
 import { DataBase } from 'src/database/database';
 import { HttpException, Injectable } from '@nestjs/common';
 import { StatusCodes } from 'http-status-codes';
+import { Favorite } from './entities/favorite.entity';
+import { Track } from 'src/tracks/entities/track.entity';
+import { Album } from 'src/albums/entities/album.entity';
 
 @Injectable()
 export class FavoritesService {
   constructor(private readonly dataBase: DataBase) {}
 
-  findAll() {
-    return {
-      artists: this.dataBase.artists.filter((artist) =>
-        this.dataBase.favorites.artists.includes(artist.id),
-      ),
-      albums: this.dataBase.albums.filter((album) =>
-        this.dataBase.favorites.albums.includes(album.id),
-      ),
-      tracks: this.dataBase.tracks.filter((track) =>
-        this.dataBase.favorites.tracks.includes(track.id),
-      ),
-    };
+  findAll(): Favorite {
+    const artists: Artist[] = this.dataBase.favorites.artists;
+    const albums: Album[] = this.dataBase.favorites.albums;
+    const tracks: Track[] = this.dataBase.favorites.tracks;
+    const favorite: Favorite = { artists, albums, tracks };
+    return favorite;
   }
 
-  createTrack(id: string) {
-    const track = this.dataBase.tracks.find((track) => track.id == id);
+  createTrack(id: string): Track {
+    const track: Track | undefined = this.dataBase.tracks.find(
+      (track) => track.id == id,
+    );
     if (!track)
       throw new HttpException(
         "track doesn't exist",
         StatusCodes.UNPROCESSABLE_ENTITY,
       );
-    if (!this.dataBase.favorites.tracks.includes(id))
-      this.dataBase.favorites.tracks.push(id);
+    this.dataBase.favorites.tracks.push(track);
+    return track;
   }
 
-  removeTrack(id: string) {
-    const indexTrack = this.dataBase.favorites.tracks.indexOf(id);
-    if (indexTrack == -1)
-      throw new HttpException(
-        `track doesn't exists in favorites`,
-        StatusCodes.NOT_FOUND,
-      );
+  removeTrack(id: string): void {
+    const indexTrack = this.dataBase.favorites.tracks.findIndex(
+      (track) => track.id === id,
+    );
     this.dataBase.favorites.tracks.splice(indexTrack, 1);
-    return `track id=${id} deleted from favorites`;
   }
 
-  createAlbum(id: string) {
+  createAlbum(id: string): Album {
     const album = this.dataBase.albums.find((album) => album.id == id);
     if (!album)
       throw new HttpException(
         "album doesn't exist",
         StatusCodes.UNPROCESSABLE_ENTITY,
       );
-    if (!this.dataBase.favorites.albums.includes(id))
-      this.dataBase.favorites.albums.push(id);
+    this.dataBase.favorites.albums.push(album);
+    return album;
   }
 
-  removeAlbum(id: string) {
-    const indexAlbum = this.dataBase.favorites.albums.indexOf(id);
-    if (indexAlbum == -1)
-      throw new HttpException(
-        `album doesn't exists in favorites`,
-        StatusCodes.NOT_FOUND,
-      );
+  removeAlbum(id: string): void {
+    const indexAlbum = this.dataBase.favorites.albums.findIndex(
+      (album) => album.id === id,
+    );
     this.dataBase.favorites.albums.splice(indexAlbum, 1);
-    return `album id=${id} deleted from favorites`;
   }
 
-  createArtist(id: string) {
+  createArtist(id: string): Artist {
     const artist = this.dataBase.artists.find((artist) => artist.id == id);
     if (!artist)
       throw new HttpException(
         "artist doesn't exist",
         StatusCodes.UNPROCESSABLE_ENTITY,
       );
-    if (!this.dataBase.favorites.artists.includes(id))
-      this.dataBase.favorites.artists.push(id);
+    this.dataBase.favorites.artists.push(artist);
+    return artist;
   }
 
-  removeArtist(id: string) {
-    const indexArtist = this.dataBase.favorites.artists.indexOf(id);
-    if (indexArtist == -1)
-      throw new HttpException(
-        `artist doesn't exists in favorites`,
-        StatusCodes.NOT_FOUND,
-      );
+  removeArtist(id: string): void {
+    const indexArtist = this.dataBase.favorites.artists.findIndex(
+      (artist) => artist.id === id,
+    );
     this.dataBase.favorites.artists.splice(indexArtist, 1);
-    return `artist id=${id} deleted from favorites`;
   }
 }

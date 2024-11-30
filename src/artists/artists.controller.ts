@@ -14,6 +14,7 @@ import { ArtistsService } from './artists.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { validationPipe } from 'src/pipes/validation.pipe';
+import { Artist } from './entities/artist.entity';
 
 @Controller('artist')
 export class ArtistsController {
@@ -26,12 +27,12 @@ export class ArtistsController {
   }
 
   @Get()
-  findAll() {
+  findAll(): Artist[] {
     return this.artistsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string): Artist {
     return this.artistsService.findOne(id);
   }
 
