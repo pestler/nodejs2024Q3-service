@@ -1,38 +1,23 @@
-import {
-  IsNotEmpty,
-  IsString,
-  IsOptional,
-  IsUUID,
-  IsInt,
-} from 'class-validator';
+import { Exclude } from 'class-transformer';
+import { User } from '@prisma/client';
 
-export class User {
-  @IsString()
-  @IsUUID()
-  @IsNotEmpty()
-  readonly id: string;
-
-  @IsString()
-  @IsNotEmpty()
+export class UserEntity {
+  id: string;
   login: string;
-
-  @IsString()
-  @IsNotEmpty()
-  password: string;
-
-  @IsInt()
-  @IsOptional()
   version: number;
-
-  @IsInt()
-  @IsOptional()
   createdAt: number;
-
-  @IsInt()
-  @IsOptional()
   updatedAt: number;
 
+  @Exclude()
+  password: string;
+
   constructor(user: User) {
-    Object.assign(this, user);
+    this.id = user.id;
+    this.login = user.login;
+    this.version = user.version;
+    this.password = user.password;
+
+    this.createdAt = new Date(user.createdAt).getTime();
+    this.updatedAt = new Date(user.updatedAt).getTime();
   }
 }
