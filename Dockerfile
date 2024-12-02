@@ -1,5 +1,6 @@
 # Base
-FROM node:22-alpine As development
+FROM node:22-alpine 
+#As development
 #FROM node:22-slim
 
 WORKDIR /app

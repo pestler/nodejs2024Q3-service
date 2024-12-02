@@ -22,7 +22,7 @@ export class TracksController {
 
   @Post()
   @UsePipes(validationPipe)
-  create(@Body() createTrackDto: CreateTrackDto) {
+  async create(@Body() createTrackDto: CreateTrackDto) {
     return this.tracksService.create(createTrackDto);
   }
 
@@ -33,13 +33,13 @@ export class TracksController {
 
   @Get(':id')
   @UsePipes(validationPipe)
-  findOne(@Param('id', ParseUUIDPipe) id: string): Track {
+  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Track> {
     return this.tracksService.findOne(id);
   }
 
   @Put(':id')
   @UsePipes(validationPipe)
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateTrackDto: UpdateTrackDto,
   ) {
@@ -48,7 +48,7 @@ export class TracksController {
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id', ParseUUIDPipe) id: string) {
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.tracksService.remove(id);
   }
 }

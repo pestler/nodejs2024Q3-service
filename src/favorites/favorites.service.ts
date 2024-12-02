@@ -1,76 +1,80 @@
 import { Artist } from './../artists/entities/artist.entity';
-import { DataBase } from 'src/database/database';
-import { HttpException, Injectable } from '@nestjs/common';
-import { StatusCodes } from 'http-status-codes';
-import { Favorite } from './entities/favorite.entity';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { Track } from 'src/tracks/entities/track.entity';
 import { Album } from 'src/albums/entities/album.entity';
+import { PrismaService } from 'src/prisma/prisma.service';
+
+export type IFavEntity = 'track' | 'album' | 'artist';
+
+const FAVORITES_ID = null;
 
 @Injectable()
 export class FavoritesService {
-  constructor(private readonly dataBase: DataBase) {}
+  constructor(private prisma: PrismaService) {}
 
-  findAll(): Favorite {
-    const artists: Artist[] = this.dataBase.favorites.artists;
-    const albums: Album[] = this.dataBase.favorites.albums;
-    const tracks: Track[] = this.dataBase.favorites.tracks;
-    const favorite: Favorite = { artists, albums, tracks };
-    return favorite;
+  private async initFavorites(): Promise<void> {
+    const favorites = await this.prisma.favorites.findUnique({
+      where: { id: FAVORITES_ID },
+    });
+
+    if (!favorites) {
+      await this.prisma.favorites.create({
+        data: { id: FAVORITES_ID },
+      });
+    }
   }
 
-  createTrack(id: string): Track {
-    const track: Track | undefined = this.dataBase.tracks.find(
-      (track) => track.id == id,
-    );
-    if (!track)
-      throw new HttpException(
-        "track doesn't exist",
-        StatusCodes.UNPROCESSABLE_ENTITY,
+  async findAll() {
+    return await this.prisma.favorites.findFirst({
+      include: { artists: true, albums: true, tracks: true },
+    });
+  }
+  private async validateEntity(favEntity: IFavEntity | string, id: string) {
+    let entity: Track | Album | Artist;
+
+    switch (favEntity) {
+      case 'track':
+        entity = await this.prisma.track.findUnique({ where: { id } });
+        break;
+      case 'album':
+        entity = await this.prisma.album.findUnique({ where: { id } });
+        break;
+      case 'artist':
+        entity = await this.prisma.artist.findUnique({ where: { id } });
+        break;
+      default:
+        throw new UnprocessableEntityException('Invalid favorite entity');
+    }
+
+    if (!entity) {
+      throw new UnprocessableEntityException(
+        `${favEntity.charAt(0).toUpperCase() + favEntity.slice(1)} not found`,
       );
-    this.dataBase.favorites.tracks.push(track);
-    return track;
+    }
+
+    return entity;
   }
 
-  removeTrack(id: string): void {
-    const indexTrack = this.dataBase.favorites.tracks.findIndex(
-      (track) => track.id === id,
-    );
-    this.dataBase.favorites.tracks.splice(indexTrack, 1);
+  async add(favEntity: IFavEntity, id: string) {
+    await this.validateEntity(favEntity, id);
+    await this.prisma.favorites.update({
+      where: { id: FAVORITES_ID },
+      data: {
+        [favEntity + 's']: { connect: { id } },
+      },
+    });
   }
 
-  createAlbum(id: string): Album {
-    const album = this.dataBase.albums.find((album) => album.id == id);
-    if (!album)
-      throw new HttpException(
-        "album doesn't exist",
-        StatusCodes.UNPROCESSABLE_ENTITY,
-      );
-    this.dataBase.favorites.albums.push(album);
-    return album;
-  }
+  async remove(favEntity: IFavEntity, id: string) {
+    const removedEntity = await this.validateEntity(favEntity, id);
 
-  removeAlbum(id: string): void {
-    const indexAlbum = this.dataBase.favorites.albums.findIndex(
-      (album) => album.id === id,
-    );
-    this.dataBase.favorites.albums.splice(indexAlbum, 1);
-  }
-
-  createArtist(id: string): Artist {
-    const artist = this.dataBase.artists.find((artist) => artist.id == id);
-    if (!artist)
-      throw new HttpException(
-        "artist doesn't exist",
-        StatusCodes.UNPROCESSABLE_ENTITY,
-      );
-    this.dataBase.favorites.artists.push(artist);
-    return artist;
-  }
-
-  removeArtist(id: string): void {
-    const indexArtist = this.dataBase.favorites.artists.findIndex(
-      (artist) => artist.id === id,
-    );
-    this.dataBase.favorites.artists.splice(indexArtist, 1);
+    if (removedEntity) {
+      await this.prisma.favorites.update({
+        where: { id: FAVORITES_ID },
+        data: {
+          [favEntity + 's']: { disconnect: { id } },
+        },
+      });
+    }
   }
 }

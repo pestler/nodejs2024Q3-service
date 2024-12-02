@@ -1,54 +1,49 @@
-import { DataBase } from './../database/database';
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { v4 as uuid } from 'uuid';
+//import { v4 as uuid } from 'uuid';
 import { StatusCodes } from 'http-status-codes';
 import { Track } from './entities/track.entity';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class TracksService {
-  constructor(private dataBase: DataBase) {}
+  constructor(private prisma: PrismaService) {}
 
-  create(createTrackDto: CreateTrackDto): Track {
-    const track = new Track({
-      id: uuid(),
-      ...createTrackDto,
+  async create(createTrackDto: CreateTrackDto) {
+    return await this.prisma.track.create({ data: createTrackDto });
+  }
+
+  async findAll() {
+    return await this.prisma.track.findMany();
+  }
+
+  async findOne(id: string): Promise<Track> {
+    const track = await this.prisma.track.findUnique({
+      where: { id },
     });
-    this.dataBase.tracks.push(track);
-    return track;
-  }
-
-  findAll() {
-    return this.dataBase.tracks;
-  }
-
-  findOne(id: string): Track {
-    const track = this.dataBase.tracks.find((track) => track.id === id);
     if (!track) {
       throw new NotFoundException('track not found');
     }
     return track;
   }
 
-  update(id: string, updateTrackDto: UpdateTrackDto): Track {
-    const track = this.findOne(id);
-    if (!track)
+  async update(id: string, updateTrackDto: UpdateTrackDto): Promise<Track> {
+    try {
+      return await this.prisma.track.update({
+        where: { id },
+        data: updateTrackDto,
+      });
+    } catch (error) {
       throw new HttpException("Track doesn't exist", StatusCodes.NOT_FOUND);
-    track.name = updateTrackDto.name;
-    track.artistId = updateTrackDto.artistId;
-    track.albumId = updateTrackDto.albumId;
-    track.duration = updateTrackDto.duration;
-    return track;
+    }
   }
 
-  remove(id: string) {
-    const indexTrack = this.dataBase.tracks.findIndex(
-      (track) => track.id == id,
-    );
-    if (indexTrack == -1)
+  async remove(id: string) {
+    try {
+      return await this.prisma.track.delete({ where: { id } });
+    } catch (error) {
       throw new HttpException("Track doesn't exist", StatusCodes.NOT_FOUND);
-    this.dataBase.tracks.splice(indexTrack, 1);
-    return `Track id=${id} deleted`;
+    }
   }
 }

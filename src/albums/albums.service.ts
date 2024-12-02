@@ -1,62 +1,67 @@
-import { DataBase } from './../database/database';
+//import { DataBase } from './../database/database';
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { v4 as uuid } from 'uuid';
 import { StatusCodes } from 'http-status-codes';
 import { Album } from './entities/album.entity';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AlbumsService {
-  constructor(private dataBase: DataBase) {}
+  constructor(private prisma: PrismaService) {}
 
   create(createAlbumDto: CreateAlbumDto): Album {
     const album = new Album({
       id: uuid(),
       ...createAlbumDto,
     });
-    this.dataBase.albums.push(album);
+    this.prisma.album.create({ data: album });
     return album;
   }
 
-  findAll(): Album[] {
-    return this.dataBase.albums;
+  async findAll(): Promise<Album[]> {
+    const albums = await this.prisma.album.findMany();
+    return albums;
   }
 
-  findOne(id: string): Album {
-    const album = this.dataBase.albums.find((album) => album.id === id);
+  async findOne(id: string): Promise<Album> {
+    const album = await this.prisma.album.findUnique({
+      where: {
+        id,
+      },
+    });
     if (!album) {
       throw new NotFoundException('Album not found');
     }
     return album;
   }
 
-  update(id: string, updateAlbumDto: UpdateAlbumDto): Album {
-    const album = this.findOne(id);
-    if (!album)
-      throw new HttpException("album doesn't exists", StatusCodes.NOT_FOUND);
-    album.name = updateAlbumDto.name;
-    album.year = updateAlbumDto.year;
-    album.artistId = updateAlbumDto.artistId;
-    return album;
+  async update(id: string, updateAlbumDto: UpdateAlbumDto): Promise<Album> {
+    try {
+      const updatedAlbum = await this.prisma.album.update({
+        where: {
+          id,
+        },
+        data: {
+          name: updateAlbumDto.name,
+          year: updateAlbumDto.year,
+          artistId: updateAlbumDto.artistId,
+        },
+      });
+      return updatedAlbum;
+    } catch (err) {
+      if (err) {
+        throw new HttpException("album doesn't exists", StatusCodes.NOT_FOUND);
+      }
+    }
   }
 
-  remove(id: string | Album) {
-    const indexAlbum = this.dataBase.albums.findIndex(
-      (album) => album.id == id,
-    );
-    if (indexAlbum == -1)
+  async remove(id: string): Promise<void> {
+    try {
+      await await this.prisma.album.delete({ where: { id } });
+    } catch (error) {
       throw new HttpException("album doesn't exists", StatusCodes.NOT_FOUND);
-    this.dataBase.albums.splice(indexAlbum, 1);
-
-    this.dataBase.tracks
-      .filter((track) => track.albumId == id)
-      .forEach((track) => (track.albumId = null));
-
-    this.dataBase.favorites.albums = this.dataBase.favorites.albums.filter(
-      (albumId) => albumId != id,
-    );
-
-    return `Album id=${id} deleted`;
+    }
   }
 }

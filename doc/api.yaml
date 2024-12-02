@@ -378,10 +378,26 @@ components:
       properties: {}
     CreateAlbumDto:
       type: object
-      properties: {}
+      properties:
+        name:
+          type: string
+        year:
+          type: number
+        artistId:
+          type: string
+      required:
+        - name
+        - year
+        - artistId
     UpdateAlbumDto:
       type: object
-      properties: {}
+      properties:
+        name:
+          type: string
+        year:
+          type: number
+        artistId:
+          type: string
     CreateUserDto:
       type: object
       properties: {}
