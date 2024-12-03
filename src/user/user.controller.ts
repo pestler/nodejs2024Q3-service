@@ -13,7 +13,6 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
 import { validationPipe } from 'src/pipes/validation.pipe';
 
 @Controller('user')
@@ -22,7 +21,7 @@ export class UserController {
 
   @Post()
   @UsePipes(validationPipe)
-  create(@Body() createUserDto: CreateUserDto): Omit<User, 'password'> {
+  create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
 
@@ -32,7 +31,7 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string): Omit<User, 'password'> {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.userService.findOne(id);
   }
 

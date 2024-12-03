@@ -10,13 +10,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ArtistsService {
   constructor(private prisma: PrismaService) {}
 
-  /*   async create(createArtistDto: CreateArtistDto): Promise<Artist> {
-    const artist = new Artist({
-      id: uuid(),
-      ...createArtistDto,
-    });
-    return artist;
-  } */
   async create(createArtistDto: CreateArtistDto): Promise<Artist> {
     return await this.prisma.artist.create({ data: createArtistDto });
   }

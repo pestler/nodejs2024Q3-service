@@ -1,4 +1,3 @@
-//import { DataBase } from './../database/database';
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';

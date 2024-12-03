@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+/* import { Module } from '@nestjs/common';
 import { DataBase } from './database';
 
 @Module({
@@ -6,3 +6,4 @@ import { DataBase } from './database';
   providers: [DataBase],
 })
 export class DataBaseModule {}
+ */

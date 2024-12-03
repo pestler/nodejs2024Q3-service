@@ -148,10 +148,15 @@ paths:
           description: ""
       tags: &a3
         - Favorites
-  /favs/track/{id}:
+  /favs/{entityType}/{id}:
     post:
-      operationId: FavoritesController_createTrack
+      operationId: FavoritesController_addToFavorites
       parameters:
+        - name: entityType
+          required: true
+          in: path
+          schema:
+            type: string
         - name: id
           required: true
           in: path
@@ -162,58 +167,13 @@ paths:
           description: ""
       tags: *a3
     delete:
-      operationId: FavoritesController_removeTrack
+      operationId: FavoritesController_removeFromFavorites
       parameters:
-        - name: id
+        - name: entityType
           required: true
           in: path
           schema:
             type: string
-      responses:
-        "204":
-          description: ""
-      tags: *a3
-  /favs/album/{id}:
-    post:
-      operationId: FavoritesController_createAlbum
-      parameters:
-        - name: id
-          required: true
-          in: path
-          schema:
-            type: string
-      responses:
-        "201":
-          description: ""
-      tags: *a3
-    delete:
-      operationId: FavoritesController_removeAlbum
-      parameters:
-        - name: id
-          required: true
-          in: path
-          schema:
-            type: string
-      responses:
-        "204":
-          description: ""
-      tags: *a3
-  /favs/artist/{id}:
-    post:
-      operationId: FavoritesController_createArtist
-      parameters:
-        - name: id
-          required: true
-          in: path
-          schema:
-            type: string
-      responses:
-        "201":
-          description: ""
-      tags: *a3
-    delete:
-      operationId: FavoritesController_removeArtist
-      parameters:
         - name: id
           required: true
           in: path

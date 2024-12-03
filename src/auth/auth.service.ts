@@ -7,7 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { AuthEntity } from './dto/auth.entity';
 import { DataBase } from 'src/database/database';
-import { User } from 'src/user/entities/user.entity';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {

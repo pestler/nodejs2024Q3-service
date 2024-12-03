@@ -21,3 +21,5 @@ export class UserEntity {
     this.updatedAt = new Date(user.updatedAt).getTime();
   }
 }
+export { User };
+
